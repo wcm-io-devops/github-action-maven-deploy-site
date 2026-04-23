@@ -72,9 +72,12 @@ runs:
       shell: bash
 
     - name: Stage and deploy site
+      env:
+        SCM_USERNAME: ${{ inputs.github-site-site-deploy-username }}
+        SCM_PASSWORD: ${{ inputs.github-site-site-deploy-password }}
       run: >
         ${{ inputs.maven-executable }} ${{ inputs.maven-site-deploy-args }} ${{ inputs.maven-additional-args }}
         -Dscmpublish.checkinComment="Maven site: ${{ github.repository }}"
-        -Dusername=${{ inputs.github-site-site-deploy-username }}
-        -Dpassword=${{ inputs.github-site-site-deploy-password }}
+        "-Dusername=${SCM_USERNAME}"
+        "-Dpassword=${SCM_PASSWORD}"
       shell: bash
