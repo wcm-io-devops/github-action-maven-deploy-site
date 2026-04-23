@@ -20,8 +20,7 @@ inputs:
   maven-site-deploy-args:
     description: Maven goals and command line parameter to deploy the build
     required: false
-    default: >
-      -s ./.maven-settings.xml -Pcontinuous-integration -B site:stage scm-publish:publish-scm
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B site:stage scm-publish:publish-scm
   maven-additional-args:
     description: Additional maven goals or command line parameters to be added to all maven calls
     required: false
@@ -76,7 +75,9 @@ runs:
       shell: bash
 
     - name: Stage and deploy site
+      env:
+        CHECKIN_COMMENT: "Maven site: ${{ github.repository }}"
       run: >
         ${{ inputs.maven-executable }} ${{ inputs.maven-site-deploy-args }} ${{ inputs.maven-additional-args }}
-        -Dscmpublish.checkinComment="Maven site: ${{ github.repository }}"
+        "-Dscmpublish.checkinComment=${CHECKIN_COMMENT}"
       shell: bash
