@@ -14,13 +14,13 @@ inputs:
     required: false
     default: mvn    
   maven-deploy-args:
-    description: Maven goals and command line parameter to deploy the build
+    description: Maven goals and command line parameter to deploy the build and generate the site
     required: false
-    default: -s ./.maven-settings.xml -Pcontinuous-integration -B -U clean deploy
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B -U clean deploy site
   maven-site-stage-args:
     description: Maven goals and command line parameter to stage the site
     required: false
-    default: -s ./.maven-settings.xml -Pcontinuous-integration -B site site:stage
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B site:stage
   maven-site-publish-args:
     description: Maven goals and command line parameter to publish the staged site
     required: false
@@ -71,14 +71,14 @@ runs:
         java-version: ${{ inputs.java-version }}
         cache: maven
 
-    - name: Build and deploy
+    - name: Build, deploy and generate site
       env:
         SONATYPE_USERNAME: ${{ inputs.sonatype-username }}
         SONATYPE_PASSWORD: ${{ inputs.sonatype-password }}
       run: ${{ inputs.maven-executable }} ${{ inputs.maven-deploy-args }} ${{ inputs.maven-additional-args }}
       shell: bash
 
-    - name: Generate and stage site
+    - name: Stage site
       run: ${{ inputs.maven-executable }} ${{ inputs.maven-site-stage-args }} ${{ inputs.maven-additional-args }}
       shell: bash
 
