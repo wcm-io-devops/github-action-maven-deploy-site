@@ -17,7 +17,7 @@ inputs:
     description: Maven goals and command line parameter to deploy the build
     required: false
     default: -s ./.maven-settings.xml -Pcontinuous-integration -B -U clean deploy site
-  maven-sited-deploy-args:
+  maven-site-deploy-args:
     description: Maven goals and command line parameter to deploy the build
     required: false
     default: >
@@ -36,6 +36,12 @@ inputs:
     required: true
   github-site-site-deploy-name:
     description: GH_SITE_DEPLOY_NAME secret
+    required: true
+  github-site-site-deploy-username:
+    description: GH_SITE_DEPLOY_USERNAME secret
+    required: true
+  github-site-site-deploy-password:
+    description: GH_SITE_DEPLOY_PAT secret
     required: true
 
 runs:
@@ -60,7 +66,7 @@ runs:
 
     - name: Build, verify, deploy, generate site
       env:
-        SONATYPE_USERNAME: ${{ inputs.sonatype-usernam }}
+        SONATYPE_USERNAME: ${{ inputs.sonatype-username }}
         SONATYPE_PASSWORD: ${{ inputs.sonatype-password }}
       run: ${{ inputs.maven-executable }} ${{ inputs.maven-deploy-args }} ${{ inputs.maven-additional-args }}
       shell: bash
@@ -69,6 +75,6 @@ runs:
       run: >
         ${{ inputs.maven-executable }} ${{ inputs.maven-site-deploy-args }} ${{ inputs.maven-additional-args }}
         -Dscmpublish.checkinComment="Maven site: ${{ github.repository }}"
-        -Dusername=${{ inputs.github-site-site-deploy-email }}
-        -Dpassword=${{ inputs.github-site-site-deploy-name }}
+        -Dusername=${{ inputs.github-site-site-deploy-username }}
+        -Dpassword=${{ inputs.github-site-site-deploy-password }}
       shell: bash
