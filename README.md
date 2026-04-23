@@ -6,7 +6,35 @@ Composite GitHub Action that deploys Maven artifacts and Maven site.
 Usage example:
 
 ```yaml
-TBD
+# Deploy snapshots to Sonatype OSS repository and deploy site to GitHub Pages
+
+name: Deploy
+
+concurrency: ${{ github.workflow }}
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Maven Deploy with Site
+        uses: wcm-io-devops/github-action-maven-deploy-site@v1
+        with:
+          java-version: 21
+          maven-executable: ./mvnw
+          sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
+          sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
+          github-site-site-deploy-email: ${{ secrets.GH_SITE_DEPLOY_EMAIL }}
+          github-site-site-deploy-name: ${{ secrets.GH_SITE_DEPLOY_NAME }}
+          github-site-site-deploy-username: ${{ secrets.GH_SITE_DEPLOY_USERNAME }}
+          github-site-site-deploy-password: ${{ secrets.GH_SITE_DEPLOY_PAT }}
 ```
 
 For all parameters, see [action.yml](action.yml).
