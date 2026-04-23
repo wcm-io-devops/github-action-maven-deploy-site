@@ -85,9 +85,10 @@ runs:
     # This is to ensure that the generated JaCoCo report files are normalized and do not contain timestamps
     # which would cause the scm-publish plugin to detect changes in the site content and thus always publish
     # a new site version even if there are no real changes in the site content.
-    - name: Remove JaCoCo XML report files
+    - name: Remove JaCoCo report files
       run: |
         find target/staging -name "jacoco.xml" -delete
+        find target/staging -name "jacoco.csv" -delete
         find target/staging -name "jacoco-sessions.html" -delete
       shell: bash
 
