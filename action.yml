@@ -16,11 +16,15 @@ inputs:
   maven-deploy-args:
     description: Maven goals and command line parameter to deploy the build
     required: false
-    default: -s ./.maven-settings.xml -Pcontinuous-integration -B -U clean deploy site
-  maven-site-deploy-args:
-    description: Maven goals and command line parameter to deploy the build
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B -U clean deploy
+  maven-site-stage-args:
+    description: Maven goals and command line parameter to stage the site
     required: false
-    default: -s ./.maven-settings.xml -Pcontinuous-integration -B site:stage scm-publish:publish-scm
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B site site:stage
+  maven-site-publish-args:
+    description: Maven goals and command line parameter to publish the staged site
+    required: false
+    default: -s ./.maven-settings.xml -Pcontinuous-integration -B scm-publish:publish-scm
   maven-additional-args:
     description: Additional maven goals or command line parameters to be added to all maven calls
     required: false
@@ -67,17 +71,30 @@ runs:
         java-version: ${{ inputs.java-version }}
         cache: maven
 
-    - name: Build, verify, deploy, generate site
+    - name: Build and deploy
       env:
         SONATYPE_USERNAME: ${{ inputs.sonatype-username }}
         SONATYPE_PASSWORD: ${{ inputs.sonatype-password }}
       run: ${{ inputs.maven-executable }} ${{ inputs.maven-deploy-args }} ${{ inputs.maven-additional-args }}
       shell: bash
 
-    - name: Stage and deploy site
+    - name: Generate and stage site
+      run: ${{ inputs.maven-executable }} ${{ inputs.maven-site-stage-args }} ${{ inputs.maven-additional-args }}
+      shell: bash
+
+    # This is to ensure that the generated JaCoCo report files are normalized and do not contain timestamps
+    # which would cause the scm-publish plugin to detect changes in the site content and thus always publish
+    # a new site version even if there are no real changes in the site content.
+    - name: Remove JaCoCo XML report files
+      run: |
+        find target/staging -name "jacoco.xml" -delete
+        find target/staging -name "jacoco-sessions.html" -delete
+      shell: bash
+
+    - name: Publish site
       env:
         CHECKIN_COMMENT: "Maven site: ${{ github.repository }}"
       run: >
-        ${{ inputs.maven-executable }} ${{ inputs.maven-site-deploy-args }} ${{ inputs.maven-additional-args }}
+        ${{ inputs.maven-executable }} ${{ inputs.maven-site-publish-args }} ${{ inputs.maven-additional-args }}
         "-Dscmpublish.checkinComment=${CHECKIN_COMMENT}"
       shell: bash
