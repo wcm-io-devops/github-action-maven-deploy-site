@@ -64,12 +64,17 @@ runs:
         git config --global url."https://${SCM_USERNAME}:${SCM_PASSWORD}@github.com/".insteadOf "https://github.com/"
       shell: bash
 
+    - name: Cache Maven packages
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccda3a # v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ inputs.java-version }}
+
     - name: Setup JDK
       uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
       with:
         distribution: ${{ inputs.java-distribution }}
         java-version: ${{ inputs.java-version }}
-        cache: maven
 
     - name: Build and deploy
       env:
