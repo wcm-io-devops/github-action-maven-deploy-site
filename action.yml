@@ -65,7 +65,7 @@ runs:
       shell: bash
 
     - name: Cache Maven packages
-      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccda3a # v4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ inputs.java-version }}
